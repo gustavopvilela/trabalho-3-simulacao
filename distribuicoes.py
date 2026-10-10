@@ -29,7 +29,10 @@ def beta (a, b):
         if alfa * math.log(alfa / (b + w)) + gama * v - 1.3862944 >= math.log(u1 * u1 * u2):
             return w / (b + w)
 
-def pert (otimista, provavel, pessimista) -> float:
+def pert (otimista, provavel, pessimista) -> float | None:
+    if otimista == pessimista or not (otimista <= provavel <= pessimista):
+        return None
+
     a = 1 + 4 * (provavel - otimista) / (pessimista - otimista)
     b = 1 + 4 * (pessimista - provavel) / (pessimista - otimista)
     return otimista + (pessimista - otimista) * beta(a, b)
@@ -41,7 +44,10 @@ def normal (media=0.0, desvio=1.0) -> float:
     return media + desvio * z
 
 def lognormal (media_ln, desvio_ln):
-    return math.exp(normal(media_ln, desvio_ln))
+    media = math.log((media_ln**2) / (math.sqrt(desvio_ln**2 + media_ln**2)))
+    desvio = math.sqrt(math.log(1 + ((desvio_ln**2) / (media_ln**2))))
+
+    return math.exp(normal(media, desvio))
 
 def bernoulli (sucesso) -> int:
     return 1 if uniforme() < sucesso else 0
